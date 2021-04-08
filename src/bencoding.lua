@@ -51,9 +51,10 @@ local function decodeListOrDictionary(data)
 	local isList = data:sub(1, 1) == "l"
 	local key, readingKey
 	readingKey = not isList
-	repeat
+	while data:sub(pos, pos) ~= "e" do
 		btype = data:sub(pos, pos)
-		if readingKey then
+		if btype == "" then break end
+		if readingKey and tonumber(btype) then
 			key = bencoding.string.decode(data:sub(pos))
 			pos = pos + key:len() + 2
 			readingKey = false
@@ -76,7 +77,7 @@ local function decodeListOrDictionary(data)
 				readingKey = true
 			end
 		end
-	until data:sub(pos, pos) == "e"
+	end
 	return bdecodedData
 end
 
