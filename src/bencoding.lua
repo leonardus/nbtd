@@ -71,8 +71,8 @@ local function decodeListOrDictionary(data)
 				value = bencoding.integer.decode(data:sub(pos))
 				pos = data:find("e", pos)+1
 			elseif (not isList) and btype == "l" then
-				value = decodeListOrDictionary(data:sub(pos))
-				pos = data:find("e", pos)+1
+				value, size = decodeListOrDictionary(data:sub(pos))
+				pos = pos + size
 			end
 			if isList then
 				table.insert(bdecodedData, value)
@@ -82,7 +82,7 @@ local function decodeListOrDictionary(data)
 			end
 		end
 	end
-	return bdecodedData
+	return bdecodedData, pos
 end
 
 bencoding.list = {}
