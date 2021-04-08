@@ -7,7 +7,11 @@ function bencoding.string.encode(str)
 	return tostring(str:len()) .. ":" .. str
 end
 function bencoding.string.decode(str)
-	return str:sub(3, tonumber(str:sub(1, 1))+2)
+	local delimiter = str:find(":")
+	local len = tonumber(str:sub(1, delimiter - 1))
+	local bdecodedStr = str:sub(delimiter + 1, delimiter+len)
+	local size = bdecodedStr:len() + delimiter
+	return bdecodedStr, size
 end
 
 bencoding.integer = {}
@@ -55,14 +59,14 @@ local function decodeListOrDictionary(data)
 		btype = data:sub(pos, pos)
 		if btype == "" then break end
 		if readingKey and tonumber(btype) then
-			key = bencoding.string.decode(data:sub(pos))
-			pos = pos + key:len() + 2
+			key, size = bencoding.string.decode(data:sub(pos))
+			pos = pos + size
 			readingKey = false
 		else
 			local value
 			if tonumber(btype) then -- string type encoding
-				value = bencoding.string.decode(data:sub(pos))
-				pos = pos + value:len() + 2
+				value, size = bencoding.string.decode(data:sub(pos))
+				pos = pos + size
 			elseif btype == "i" then
 				value = bencoding.integer.decode(data:sub(pos))
 				pos = data:find("e", pos)+1
