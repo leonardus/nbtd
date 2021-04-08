@@ -37,7 +37,7 @@ local function encodeListOrDictionary(data)
 			encodedItem = bencoding.string.encode(v)
 		elseif type(v) == "number" then
 			encodedItem = bencoding.integer.encode(v)
-		elseif (not isList) and type(v) == "table" then
+		elseif type(v) == "table" then
 			encodedItem = encodeListOrDictionary(v)
 		end
 		if not isList then
@@ -70,7 +70,7 @@ local function decodeListOrDictionary(data)
 			elseif btype == "i" then
 				value = bencoding.integer.decode(data:sub(pos))
 				pos = data:find("e", pos)+1
-			elseif (not isList) and btype == "l" then
+			elseif btype == "l" or btype == "d" then
 				value, size = decodeListOrDictionary(data:sub(pos))
 				pos = pos + size
 			end
