@@ -19,6 +19,7 @@ function torrents.init(dataDir)
 		if success then
 			local binaryPieces = base64.decode(decodedContents.metainfo.info.pieces)
 			decodedContents.metainfo.info.pieces = binaryPieces
+			decodedContents.state = {}
 			torrents.list[decodedContents.hexHash] = decodedContents
 		end
 	end
@@ -27,8 +28,13 @@ end
 function torrents.write(t)
 	local binaryPieces = t.metainfo.info.pieces
 	t.metainfo.info.pieces = base64.encode(binaryPieces)
+	local state = t.state
+	t.state = nil
+
 	local serializedData = cjson.encode(t)
+
 	t.metainfo.info.pieces = binaryPieces
+	t.state = state
 
 	local fd = io.open(torrents.dataDir .. "/" .. t.hexHash, "w")
 	fd:write(serializedData)
@@ -44,6 +50,7 @@ function torrents.add(metainfo)
 		metainfo = metainfo,
 		hexHash = hexHash,
 		version = 1, -- BitTorrent protocol version
+		state = {},
 	}
 
 	torrents.list[hexHash] = t
