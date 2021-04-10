@@ -3,4 +3,4 @@ addr = "localhost"
 port = 12150
 
 [fs]
-#data_dir = "/usr/share"
+#data_dir = "/usr/share/nbtd"
