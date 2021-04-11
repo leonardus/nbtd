@@ -44,7 +44,7 @@ end
 function torrents.add(metainfo)
 	-- !! TODO: Validation, Checking for duplicates, ...
 	metainfo = bencoding.dictionary.decode(metainfo)
-	local hexHash = sha1.sha1(metainfo.info.pieces)
+	local hexHash = sha1.sha1(bencoding.dictionary.encode(metainfo.info))
 
 	local t = {
 		metainfo = metainfo,
