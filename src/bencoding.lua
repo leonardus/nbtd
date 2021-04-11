@@ -30,8 +30,14 @@ local function encodeListOrDictionary(data)
 		return true
 	end
 	local isList = tblIsList(data)
+
+	local sortedKeys = {}
+	for i_k in pairs(data) do table.insert(sortedKeys, i_k) end
+	table.sort(sortedKeys)
+
 	local bencodedStr = isList and "l" or "d"
-	for k, v in pairs(data) do
+	for _, i_k in ipairs(sortedKeys) do
+		local v = data[i_k]
 		local encodedItem
 		if type(v) == "string" then
 			encodedItem = bencoding.string.encode(v)
@@ -41,7 +47,7 @@ local function encodeListOrDictionary(data)
 			encodedItem = encodeListOrDictionary(v)
 		end
 		if not isList then
-			bencodedStr = bencodedStr .. bencoding.string.encode(k)
+			bencodedStr = bencodedStr .. bencoding.string.encode(i_k)
 		end
 		bencodedStr = bencodedStr .. encodedItem
 	end
