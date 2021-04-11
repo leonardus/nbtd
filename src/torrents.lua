@@ -9,6 +9,17 @@ local torrents = {}
 torrents.list = {}
 torrents.dataDir = nil
 
+local function readyState(t)
+	local peerId = ""
+	for i = 1, 20 do
+		peerId = peerId .. string.char(math.random(0,255))
+	end
+
+	t.state = {
+		peerId = peerId,
+	}
+end
+
 function torrents.init(dataDir)
 	torrents.dataDir = dataDir
 	for filename in lfs.dir(dataDir) do
@@ -19,7 +30,7 @@ function torrents.init(dataDir)
 		if success then
 			local binaryPieces = base64.decode(decodedContents.metainfo.info.pieces)
 			decodedContents.metainfo.info.pieces = binaryPieces
-			decodedContents.state = {}
+			readyState(decodedContents)
 			torrents.list[decodedContents.hexHash] = decodedContents
 		end
 	end
@@ -50,9 +61,9 @@ function torrents.add(metainfo)
 		metainfo = metainfo,
 		hexHash = hexHash,
 		version = 1, -- BitTorrent protocol version
-		state = {},
 	}
 
+	readyState(t)
 	torrents.list[hexHash] = t
 	torrents.write(t)
 
