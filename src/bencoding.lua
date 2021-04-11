@@ -27,7 +27,7 @@ function bencoding.integer.decode(int)
 	if not marker then
 		error("Malformed integer (no end marker)")
 	end
-	if int:sub(2, 2) == "0" and marker ~= 3 then
+	if (int:sub(2, 2) == "0" and marker ~= 3) or int:sub(2, 3) == "-0" then
 		error("Malformed integer (leading zero)")
 	end
 	local typeconv = tonumber(int:sub(2, marker-1))
