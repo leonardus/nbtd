@@ -11,7 +11,7 @@ torrents.dataDir = nil
 
 local function readyState(t)
 	local peerId = ""
-	for i = 1, 20 do
+	for _ = 1, 20 do
 		peerId = peerId .. string.char(math.random(0,255))
 	end
 

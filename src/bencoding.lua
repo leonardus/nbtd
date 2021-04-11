@@ -39,7 +39,7 @@ end
 
 local function encodeListOrDictionary(data)
 	local function tblIsList(tbl)
-		for k, v in pairs(tbl) do
+		for k in pairs(tbl) do
 			if type(k) == "string" then return false end
 		end
 		return true
@@ -82,6 +82,7 @@ local function decodeListOrDictionary(data)
 		if btype == "" then
 			error("Malformed list or dictionary (no end marker)")
 		end
+		local size
 		if readingKey and tonumber(btype) then
 			key, size = bencoding.string.decode(data:sub(pos))
 			table.insert(keyOrder, key)
@@ -118,8 +119,8 @@ local function decodeListOrDictionary(data)
 		end
 		local sortedKeys = shallowCopy(keyOrder)
 		table.sort(sortedKeys)
-		for i, key in ipairs(sortedKeys) do
-			if keyOrder[i] ~= key then
+		for i, sortedKey in ipairs(sortedKeys) do
+			if keyOrder[i] ~= sortedKey then
 				error("Malformed dictionary (keys not sorted)")
 			end
 		end
