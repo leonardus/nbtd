@@ -52,9 +52,9 @@ function torrents.write(t)
 	fd:close()
 end
 
-function torrents.add(metainfo)
+function torrents.add(bencodedMetainfo)
 	-- !! TODO: Validation, Checking for duplicates, ...
-	metainfo = bencoding.dictionary.decode(metainfo)
+	local metainfo = bencoding.dictionary.decode(bencodedMetainfo)
 	local hexHash = sha1.sha1(bencoding.dictionary.encode(metainfo.info))
 
 	local t = {
