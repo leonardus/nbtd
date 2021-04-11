@@ -1,14 +1,18 @@
 local bencoding = {}
 
--- !! TODO: Handle malformed encodings
-
 bencoding.string = {}
 function bencoding.string.encode(str)
 	return tostring(str:len()) .. ":" .. str
 end
 function bencoding.string.decode(str)
 	local delimiter = str:find(":")
+	if not delimiter then
+		error("Malformed string (no delimiter)")
+	end
 	local len = tonumber(str:sub(1, delimiter - 1))
+	if not len then
+		error("Malformed string (illegal length)")
+	end
 	local bdecodedStr = str:sub(delimiter + 1, delimiter+len)
 	local size = bdecodedStr:len() + delimiter
 	return bdecodedStr, size
@@ -19,7 +23,18 @@ function bencoding.integer.encode(int)
 	return "i" .. tostring(int) .. "e"
 end
 function bencoding.integer.decode(int)
-	return tonumber(int:sub(2, int:find("e")-1))
+	local marker = int:find("e")
+	if not marker then
+		error("Malformed integer (no end marker)")
+	end
+	if int:sub(2, 2) == "0" then
+		error("Malformed integer (leading zero)")
+	end
+	local typeconv = tonumber(int:sub(2, marker-1))
+	if not typeconv then
+		error("Malformed integer (failed to convert to string)")
+	end
+	return typeconv
 end
 
 local function encodeListOrDictionary(data)
@@ -55,17 +70,21 @@ local function encodeListOrDictionary(data)
 end
 
 local function decodeListOrDictionary(data)
-	local bdecodedData = {}
-	local pos = 2
-	local btype
 	local isList = data:sub(1, 1) == "l"
 	local key, readingKey
 	readingKey = not isList
+	local keyOrder = {}
+	local bdecodedData = {}
+	local pos = 2
+	local btype
 	while data:sub(pos, pos) ~= "e" do
 		btype = data:sub(pos, pos)
-		if btype == "" then break end
+		if btype == "" then
+			error("Malformed list or dictionary (no end marker)")
+		end
 		if readingKey and tonumber(btype) then
 			key, size = bencoding.string.decode(data:sub(pos))
+			table.insert(keyOrder, key)
 			pos = pos + size
 			readingKey = false
 		else
@@ -88,6 +107,24 @@ local function decodeListOrDictionary(data)
 			end
 		end
 	end
+
+	if not isList then
+		local function shallowCopy(t)
+			local t_2 = {}
+			for k, v in ipairs(t) do
+				t_2[k] = v
+			end
+			return t_2
+		end
+		local sortedKeys = shallowCopy(keyOrder)
+		table.sort(sortedKeys)
+		for i, key in ipairs(sortedKeys) do
+			if keyOrder[i] ~= key then
+				error("Malformed dictionary (keys not sorted)")
+			end
+		end
+	end
+
 	return bdecodedData, pos
 end
 
