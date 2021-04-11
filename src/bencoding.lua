@@ -6,13 +6,9 @@ function bencoding.string.encode(str)
 end
 function bencoding.string.decode(str)
 	local delimiter = str:find(":")
-	if not delimiter then
-		error("Malformed string (no delimiter)")
-	end
+	assert(delimiter, "Malformed string (no delimiter)")
 	local len = tonumber(str:sub(1, delimiter - 1))
-	if not len then
-		error("Malformed string (illegal length)")
-	end
+	assert(len, "Malformed string (illegal length)")
 	local bdecodedStr = str:sub(delimiter + 1, delimiter+len)
 	local size = bdecodedStr:len() + delimiter
 	return bdecodedStr, size
@@ -24,16 +20,11 @@ function bencoding.integer.encode(int)
 end
 function bencoding.integer.decode(int)
 	local marker = int:find("e")
-	if not marker then
-		error("Malformed integer (no end marker)")
-	end
-	if (int:sub(2, 2) == "0" and marker ~= 3) or int:sub(2, 3) == "-0" then
-		error("Malformed integer (leading zero)")
-	end
+	assert(marker, "Malformed integer (no end marker)")
+	local hasLeadingZero = (int:sub(2, 2) == "0" and marker ~= 3) or int:sub(2, 3) == "-0"
+	assert(not hasLeadingZero, "Malformed integer (leading zero)")
 	local typeconv = tonumber(int:sub(2, marker-1))
-	if not typeconv then
-		error("Malformed integer (failed to convert to string)")
-	end
+	assert(typeconv, "Malformed integer (failed to convert to string)")
 	return typeconv
 end
 
@@ -79,9 +70,7 @@ local function decodeListOrDictionary(data)
 	local btype
 	while data:sub(pos, pos) ~= "e" do
 		btype = data:sub(pos, pos)
-		if btype == "" then
-			error("Malformed list or dictionary (no end marker)")
-		end
+		assert(btype ~= "", "Malformed list or dictionary (no end marker)")
 		local size
 		if readingKey and tonumber(btype) then
 			key, size = bencoding.string.decode(data:sub(pos))
@@ -120,9 +109,7 @@ local function decodeListOrDictionary(data)
 		local sortedKeys = shallowCopy(keyOrder)
 		table.sort(sortedKeys)
 		for i, sortedKey in ipairs(sortedKeys) do
-			if keyOrder[i] ~= sortedKey then
-				error("Malformed dictionary (keys not sorted)")
-			end
+			assert(keyOrder[i] == sortedKey, "Malformed dictionary (keys not sorted)")
 		end
 	end
 
