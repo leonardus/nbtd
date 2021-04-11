@@ -24,7 +24,7 @@ function bencoding.integer.decode(int)
 	local hasLeadingZero = (int:sub(2, 2) == "0" and marker ~= 3) or int:sub(2, 3) == "-0"
 	assert(not hasLeadingZero, "Malformed integer (leading zero)")
 	local typeconv = tonumber(int:sub(2, marker-1))
-	assert(typeconv, "Malformed integer (failed to convert to string)")
+	assert(typeconv, "Malformed integer (failed to convert string to number)")
 	return typeconv
 end
 
