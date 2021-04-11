@@ -88,6 +88,8 @@ local function decodeListOrDictionary(data)
 			elseif btype == "l" or btype == "d" then
 				value, size = decodeListOrDictionary(data:sub(pos))
 				pos = pos + size
+			else
+				error("Unknown bencoding type: `" .. btype .. "`")
 			end
 			if isList then
 				table.insert(bdecodedData, value)
