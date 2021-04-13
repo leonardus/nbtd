@@ -1,4 +1,4 @@
-local readfile = require("readfile")
+local readfile = require("nbtd.readfile")
 local toml = require("toml")
 
 local config = {}

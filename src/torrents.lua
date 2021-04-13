@@ -1,8 +1,8 @@
 local base64 = require("base64")
-local bencoding = require("bencoding")
+local bencoding = require("nbtd.bencoding")
 local cjson = require("cjson")
 local lfs = require("lfs")
-local readfile = require("readfile")
+local readfile = require("nbtd.readfile")
 local sha1 = require("sha1")
 
 local torrents = {}
