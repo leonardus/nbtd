@@ -1,10 +1,8 @@
 local config = require("nbtd.config")
+local cqueues = require("cqueues")
 local torrents = require("nbtd.torrents")
 
--- !! TODO: This is not random enough and will make peer_id collisions possible.
--- (Clients started within the same second will be generating identical peer_ids.)
--- Find a better number to use as a random seed.
-math.randomseed(os.time())
+math.randomseed(cqueues.monotime()*10000000)
 
 config.init(arg[1] or "/etc/nbtd/ntbd.toml")
 torrents.init(
