@@ -6,7 +6,7 @@ local torrents = require("nbtd.torrents")
 -- Find a better number to use as a random seed.
 math.randomseed(os.time())
 
-config.init(arg[1] or "config.toml")
+config.init(arg[1] or "/etc/nbtd/ntbd.toml")
 torrents.init(
 	config.parsed.fs.data_dir
 		or os.getenv("XDG_DATA_HOME") .. "/nbtd"
