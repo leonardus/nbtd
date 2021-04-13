@@ -28,14 +28,23 @@ function bencoding.integer.decode(int)
 	return typeconv
 end
 
-local function encodeListOrDictionary(data)
+local function encodeListOrDictionary(data, which)
 	local function tblIsList(tbl)
+		local mt = getmetatable(tbl)
+		if mt and mt.isList then
+			return mt.isList
+		end
 		for k in pairs(tbl) do
 			if type(k) == "string" then return false end
 		end
 		return true
 	end
-	local isList = tblIsList(data)
+	local isList
+	if which then
+		isList = (which == "l") and true or false
+	else
+		isList = tblIsList(data)
+	end
 
 	local sortedKeys = {}
 	for i_k in pairs(data) do table.insert(sortedKeys, i_k) end
@@ -115,15 +124,31 @@ local function decodeListOrDictionary(data)
 		end
 	end
 
+	setmetatable(bdecodedData, {isList = isList})
+
 	return bdecodedData, pos
 end
 
 bencoding.list = {}
-bencoding.list.encode = encodeListOrDictionary
+bencoding.list.encode = function(data)
+	return encodeListOrDictionary(data, "l")
+end
 bencoding.list.decode = decodeListOrDictionary
+bencoding.list.new = function()
+	local t = {}
+	setmetatable(t, {isList = true})
+	return t
+end
 
 bencoding.dictionary = {}
-bencoding.dictionary.encode = encodeListOrDictionary
+bencoding.dictionary.encode = function(data)
+	return encodeListOrDictionary(data, "d")
+end
 bencoding.dictionary.decode = decodeListOrDictionary
+bencoding.dictionary.new = function()
+	local t = {}
+	setmetatable(t, {isList = false})
+	return t
+end
 
 return bencoding
