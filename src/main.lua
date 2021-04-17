@@ -32,29 +32,29 @@ local function main()
 				local line = client:read("*l")
 				if line == nil then client:close() break end
 
-				local decodeSuccess, decoded = pcall(function()
+				local decodeSuccess, message = pcall(function()
 					return bencoding.dictionary.decode(line)
 				end)
-				if decodeSuccess and decoded.command then
-					local commandName = decoded.command:lower()
+				if decodeSuccess and message.command then
+					local commandName = message.command:lower()
 					local action = commands[commandName]
 					local context = {
 						controller = controller,
 						client = client,
 					}
 					if not action then
-						sendresponse(context, decoded, {
+						sendresponse(context, message, {
 								success = 0,
 								error = "unknown_command",
 						})
-					elseif type(decoded.args) ~= "table" then
-						sendresponse(context, decoded, {
+					elseif type(message.args) ~= "table" then
+						sendresponse(context, message, {
 								success = 0,
 								error = "no_arguments",
 						})
 					else
 						pcall(function()
-							action(context, decoded)
+							action(context, message)
 						end)
 					end
 				end
