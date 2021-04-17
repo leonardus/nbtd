@@ -23,8 +23,11 @@ build = {
 	modules = {
 		["nbtd"] = "src/main.lua",
 		["nbtd.bencoding"] = "src/bencoding.lua",
+		["nbtd.commands"] = "src/commands.lua",
+		["nbtd.commands.ping"] = "src/commands/ping.lua",
 		["nbtd.config"] = "src/config.lua",
 		["nbtd.readfile"] = "src/readfile.lua",
+		["nbtd.sendresponse"] = "src/sendresponse.lua",
 		["nbtd.torrents"] = "src/torrents.lua",
 		["nbtd.uriencoding"] = "src/uriencoding.lua"
 	},

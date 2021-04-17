@@ -1,5 +1,7 @@
 local bencoding = require("nbtd.bencoding")
+local commands = require("nbtd.commands")
 local config = require("nbtd.config")
+local sendresponse = require("nbtd.sendresponse")
 local cqueues = require("cqueues")
 local socket = require("cqueues.socket")
 local torrents = require("nbtd.torrents")
@@ -34,7 +36,27 @@ local function main()
 					return bencoding.dictionary.decode(line)
 				end)
 				if decodeSuccess and decoded.command then
-					local command = decoded.command:lower()
+					local commandName = decoded.command:lower()
+					local action = commands[commandName]
+					local context = {
+						controller = controller,
+						client = client,
+					}
+					if not action then
+						sendresponse(context, decoded, {
+								success = 0,
+								error = "unknown_command",
+						})
+					elseif type(decoded.args) ~= "table" then
+						sendresponse(context, decoded, {
+								success = 0,
+								error = "no_arguments",
+						})
+					else
+						pcall(function()
+							action(context, decoded)
+						end)
+					end
 				end
 			end
 		end)
