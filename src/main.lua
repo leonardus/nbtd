@@ -1,3 +1,4 @@
+local bencoding = require("nbtd.bencoding")
 local config = require("nbtd.config")
 local cqueues = require("cqueues")
 local socket = require("cqueues.socket")
@@ -20,6 +21,7 @@ local function main()
 	print("[nbtd] Listening on " .. host .. ":" .. tostring(port))
 	while true do
 		local client = server:accept()
+		client:setmaxline(2^20) -- 1MiB
 		controller:wrap(function()
 			while true do
 				if socket.type(client) == "closed socket" then
@@ -27,6 +29,13 @@ local function main()
 				end
 				local line = client:read("*l")
 				if line == nil then client:close() break end
+
+				local decodeSuccess, decoded = pcall(function()
+					return bencoding.dictionary.decode(line)
+				end)
+				if decodeSuccess and decoded.command then
+					local command = decoded.command:lower()
+				end
 			end
 		end)
 	end
