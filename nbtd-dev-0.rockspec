@@ -7,7 +7,7 @@ description = {
 }
 dependencies = {
 	"lua >= 5.1",
-	"base64 >= 1.5",
+	"lbase64 >= 20120807",
 	"sha1 >= 0.6",
 	"luafilesystem >= 1.8",
 	"lua-cjson >= 2.1",
