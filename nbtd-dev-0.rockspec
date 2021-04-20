@@ -24,6 +24,7 @@ build = {
 		["nbtd"] = "src/main.lua",
 		["nbtd.bencoding"] = "src/bencoding.lua",
 		["nbtd.commands"] = "src/commands.lua",
+		["nbtd.commands.add"] = "src/commands/add.lua",
 		["nbtd.commands.ping"] = "src/commands/ping.lua",
 		["nbtd.config"] = "src/config.lua",
 		["nbtd.readfile"] = "src/readfile.lua",
