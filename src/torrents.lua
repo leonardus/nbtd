@@ -81,13 +81,24 @@ function torrents.add(bencodedMetainfo)
 end
 
 function torrents.remove(hexHash)
+	if hexHash:sub(hexHash:find("[0-9A-Fa-f]+")) ~= hexHash then
+		error({reason = "invalid_infohash"})
+	end
+	local fileExists = false
 	for filename in lfs.dir(torrents.dataDir) do
 		if filename == hexHash then
+			fileExists = true
 			local fullPath = torrents.dataDir .. "/" .. filename
-			os.remove(fullPath)
+			if not pcall(function() os.remove(fullPath) end) then
+				error({reason = "file_removal_failure"})
+			else
+				torrents.list[hexHash] = nil
+			end
 		end
 	end
-	torrents.list[hexHash] = nil
+	if not fileExists then
+		error({reason = "file_not_exists"})
+	end
 end
 
 return torrents
