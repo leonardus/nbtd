@@ -26,6 +26,7 @@ build = {
 		["nbtd.commands"] = "src/commands.lua",
 		["nbtd.commands.add"] = "src/commands/add.lua",
 		["nbtd.commands.ping"] = "src/commands/ping.lua",
+		["nbtd.commands.remove"] = "src/commands/remove.lua",
 		["nbtd.config"] = "src/config.lua",
 		["nbtd.readfile"] = "src/readfile.lua",
 		["nbtd.sendresponse"] = "src/sendresponse.lua",
