@@ -54,7 +54,15 @@ end
 
 function torrents.add(bencodedMetainfo)
 	-- !! TODO: Validation, Checking for duplicates, ...
-	local metainfo = bencoding.dictionary.decode(bencodedMetainfo)
+	local decodeSuccess, metainfo = pcall(function()
+		return bencoding.dictionary.decode(bencodedMetainfo)
+	end)
+	if not decodeSuccess then
+		error({reason = "decoding_failure"})
+	end
+	if (not metainfo.info) or (not metainfo.info.pieces) then
+		error({reason = "incomplete_metainfo"})
+	end
 	local hexHash = sha1.sha1(bencoding.dictionary.encode(metainfo.info))
 
 	local t = {
@@ -64,8 +72,10 @@ function torrents.add(bencodedMetainfo)
 	}
 
 	readyState(t)
+	if not pcall(function() torrents.write(t) end) then
+		error({reason = "writing_failure"})
+	end
 	torrents.list[hexHash] = t
-	torrents.write(t)
 
 	return t
 end
