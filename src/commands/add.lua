@@ -1,5 +1,6 @@
 local sendresponse = require("nbtd.sendresponse")
 local torrents = require("nbtd.torrents")
+local base64 = require("base64")
 
 return function(context, message)
 	if (not message.args) or (not message.args.metainfo) then
@@ -10,7 +11,7 @@ return function(context, message)
 	end
 
 	local addSuccess, err = pcall(function()
-		return torrents.add(message.args.metainfo)
+		return torrents.add(base64.decode(message.args.metainfo))
 	end)
 	if not addSuccess then
 		return sendresponse(context, message, {
