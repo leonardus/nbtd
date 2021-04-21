@@ -1,6 +1,10 @@
 local base64 = require("base64")
 local bencoding = require("nbtd.bencoding")
+local escapeURI = require("nbtd.uriencoding")
 local json = require("JSON")
+local http = {
+	request = require("http.request")
+}
 local lfs = require("lfs")
 local readfile = require("nbtd.readfile")
 local sha1 = require("sha1")
@@ -17,7 +21,26 @@ local function readyState(t)
 
 	t.state = {
 		peerId = peerId,
+		port = 6881,
 	}
+end
+
+function torrents.updateTracker(t)
+	-- !! TODO: Support UDP announce URIs, error handling
+	local binHash = sha1.binary(bencoding.dictionary.encode(t.metainfo.info))
+	local requestURI = t.metainfo.announce ..
+		"?info_hash=" .. escapeURI(binHash) ..
+		"&peer_id=" .. escapeURI(t.state.peerId) ..
+		"&port=" .. tostring(t.state.port) ..
+		"&uploaded=" .. tostring(t.uploaded) ..
+		"&downloaded=" .. tostring(t.downloaded) ..
+		"&left=" .. tostring(t.left)
+
+	local requestObject = http.request.new_from_uri(requestURI)
+	local _, stream = requestObject:go(1)
+	local body = stream:get_body_as_string()
+	local trackerInfo = bencoding.dictionary.decode(body)
+	t.state.tracker = trackerInfo
 end
 
 function torrents.init(dataDir)
@@ -68,6 +91,9 @@ function torrents.add(bencodedMetainfo)
 	local t = {
 		metainfo = metainfo,
 		hexHash = hexHash,
+		uploaded = 0,
+		downloaded = 0,
+		left = metainfo.info.length,
 		version = 1, -- BitTorrent protocol version
 	}
 
