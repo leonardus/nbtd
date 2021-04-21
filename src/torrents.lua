@@ -1,6 +1,6 @@
 local base64 = require("base64")
 local bencoding = require("nbtd.bencoding")
-local cjson = require("cjson")
+local json = require("JSON")
 local lfs = require("lfs")
 local readfile = require("nbtd.readfile")
 local sha1 = require("sha1")
@@ -25,7 +25,7 @@ function torrents.init(dataDir)
 	for filename in lfs.dir(dataDir) do
 		local fullPath = dataDir .. "/" .. filename
 		local success, decodedContents = pcall(function()
-			return cjson.decode(readfile(fullPath))
+			return json:decode(readfile(fullPath))
 		end)
 		if success then
 			local binaryPieces = base64.decode(decodedContents.metainfo.info.pieces)
@@ -42,7 +42,7 @@ function torrents.write(t)
 	local state = t.state
 	t.state = nil
 
-	local serializedData = cjson.encode(t)
+	local serializedData = json:encode(t)
 
 	t.metainfo.info.pieces = binaryPieces
 	t.state = state

@@ -6,11 +6,11 @@ description = {
 	maintainer = "leonardus <leonardus@leonardus.me>",
 }
 dependencies = {
-	"lua >= 5.1",
+	"lua >= 5.2",
 	"lbase64 >= 20120807",
 	"sha1 >= 0.6",
 	"luafilesystem >= 1.8",
-	"lua-cjson >= 2.1",
+	"json-lua >= 0.1",
 	"lua-toml >= 2.0",
 	"cqueues >= 20200603.51",
 	"http 0.4"
